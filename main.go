@@ -25,7 +25,11 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/tracks", app.listTrackHandler).Methods("GET")
 	r.HandleFunc("/tracks", app.createTrackHandler).Methods("POST")
-	// r.HandleFunc("/products", ProductsHandler)
-	// r.HandleFunc("/articles", ArticlesHandler)
+
+	// Static file server
+	s := http.StripPrefix("/music/", http.FileServer(http.Dir("./music/")))
+	r.PathPrefix("/music/").Handler(s)
+
+	r.HandleFunc("/", app.index).Methods("GET")
 	http.ListenAndServe(":4242", r)
 }

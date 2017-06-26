@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"net/url"
@@ -86,4 +87,29 @@ func (a *App) listTrackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&tracks)
+}
+
+func (a *App) index(w http.ResponseWriter, r *http.Request) {
+	var tracks []Track
+	if err := a.db.Find(&tracks).Error; err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	tpl, err := template.ParseFiles("./templates/index.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	err = tpl.Execute(w, struct {
+		Tracks []Track
+	}{tracks})
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 }

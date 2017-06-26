@@ -1,6 +1,6 @@
 <h1>I FUCKINK LOVE FUN RADIO</h1>
-{{range tracks}}
+{{range $track := $.Tracks}}
 <audio controls>
-  <source src=".filename" type="audio/mp3">
+	<source src="{{$track.Filename}}" type="audio/mp3">
 </audio>
 {{end}}
