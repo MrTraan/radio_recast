@@ -8,6 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// App holds the database connection
 type App struct {
 	db *gorm.DB
 }
@@ -28,6 +29,7 @@ func (a *App) createTrackHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -36,6 +38,7 @@ func (a *App) createTrackHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := a.db.Create(&t).Error; err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
