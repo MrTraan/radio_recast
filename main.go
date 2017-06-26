@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -17,6 +19,13 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
-
 	db.AutoMigrate(&Track{})
+
+	r := mux.NewRouter()
+	r.HandleFunc("/tracks", listTrackHandler).Methods("GET")
+	r.HandleFunc("/tracks", createTrackHandler).Methods("POST")
+	// r.HandleFunc("/products", ProductsHandler)
+	// r.HandleFunc("/articles", ArticlesHandler)
+	http.Handle("/", r)
+
 }
