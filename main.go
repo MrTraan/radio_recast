@@ -18,14 +18,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	app := App{db}
 	defer db.Close()
 	db.AutoMigrate(&Track{})
 
 	r := mux.NewRouter()
-	r.HandleFunc("/tracks", listTrackHandler).Methods("GET")
-	r.HandleFunc("/tracks", createTrackHandler).Methods("POST")
+	r.HandleFunc("/tracks", app.listTrackHandler).Methods("GET")
+	r.HandleFunc("/tracks", app.createTrackHandler).Methods("POST")
 	// r.HandleFunc("/products", ProductsHandler)
 	// r.HandleFunc("/articles", ArticlesHandler)
-	http.Handle("/", r)
-
+	http.ListenAndServe(":4242", r)
 }

@@ -1,18 +1,47 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
-func createTrackHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	w.WriteHeader(http.StatusOK)
-	fmt.Println(vars)
+type App struct {
+	db *gorm.DB
 }
 
-func listTrackHandler(w http.ResponseWriter, r *http.Request) {
+func loadJSONFromRequest(r *http.Request, target interface{}) error {
+	if r.Body == nil {
+		return fmt.Errorf("Body is empty")
+	}
+	if err := json.NewDecoder(r.Body).Decode(target); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) createTrackHandler(w http.ResponseWriter, r *http.Request) {
+	var t Track
+	err := loadJSONFromRequest(r, &t)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	t.Upvotes = 0
+	t.Downvotes = 0
+
+	if err := a.db.Create(&t).Error; err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (a *App) listTrackHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
